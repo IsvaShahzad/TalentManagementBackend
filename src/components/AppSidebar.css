@@ -1,0 +1,19 @@
+/* Default nav icon look */
+.nav-icon {
+  color: #6c757d; /* neutral gray */
+  font-weight: 600; /* make icon paths thicker if possible */
+  transition: color 0.3s ease, transform 0.2s ease;
+  transform: scale(1.05); /* subtle size bump */
+}
+
+/* Active (selected) state */
+.sidebar-nav .nav-link.active .nav-icon {
+  color: #6f42c1 !important; /* purple */
+  transform: scale(1.15); /* slightly larger to emphasize selection */
+}
+
+/* Hover state */
+.sidebar-nav .nav-link:hover .nav-icon {
+  color: #6f42c1;
+  transform: scale(1.1);
+}
