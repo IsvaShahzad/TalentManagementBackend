@@ -41,7 +41,7 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Jobs / Open Roles',
+    name: 'Active Jobs',
     to: '/jobs',
     icon: <CIcon icon={cilBriefcase} customClassName="nav-icon" />,
   },
@@ -51,9 +51,15 @@ const _nav = [
     to: '/talent-pool',
     icon: <CIcon icon={cilFolderOpen} customClassName="nav-icon" />,
   },
+   {
+    component: CNavItem,
+    name: 'Position Tracker',
+    to: '/position-tracker',
+    icon: <CIcon icon={cilBriefcase} customClassName="nav-icon" />,
+  },
   {
     component: CNavItem,
-    name: 'Activity Log',
+    name: 'Activity',
     to: '/activity-log',
     icon: <CIcon icon={cilClipboard} customClassName="nav-icon" />,
   },
