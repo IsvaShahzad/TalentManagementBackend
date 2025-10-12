@@ -9,6 +9,7 @@ import {
   cilChart,
   cilSettings,
   cilCloud,
+  cilBell,
   cilLockLocked,
   cilExitToApp,
   cilClipboard,
@@ -63,6 +64,13 @@ const _nav = [
     to: '/activity-log',
     icon: <CIcon icon={cilClipboard} customClassName="nav-icon" />,
   },
+   {
+    component: CNavItem,
+    name: 'Notifications',
+    to: '/notifications',
+    icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
+  },
+
 
   // --- System Section Heading ---
   {
