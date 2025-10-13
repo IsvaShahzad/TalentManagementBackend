@@ -65,3 +65,15 @@ body {
     --cui-footer-bg: var(--cui-body-bg);
   }
 }
+// === Custom Sidebar Icon Colors ===
+
+.nav-icon {
+  color: #6193c8 !important; // bright blue
+}
+
+.nav-link:hover .nav-icon {
+  color: #6193c8 !important; // darker blue on hover
+}
+
+
+
