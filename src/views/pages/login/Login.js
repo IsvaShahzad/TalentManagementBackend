@@ -21,7 +21,7 @@ const Login = () => {
     <div
       className="min-vh-100 d-flex flex-row align-items-center justify-content-center"
       style={{
-        backgroundImage: `url(${bgImage})`, // 👈 use imported image
+        backgroundImage: `url(${bgImage})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
@@ -30,13 +30,16 @@ const Login = () => {
       <CContainer className="d-flex justify-content-center align-items-center">
         <CRow className="justify-content-center w-100">
           <CCol md={10} lg={8} xl={6}>
-            <CCard className="glass-card p-5 border-0">
+            <CCard
+              className="glass-card p-5 border-0"
+              style={{ fontFamily: 'Poppins, sans-serif' }} // 👈 Changed font
+            >
               <CCardBody>
                 <div className="text-center mb-4">
-                  <h1 className="fw-bold" style={{ color: '#0e0d0dff', fontFamily: 'Montserrat' }}>
+                 <h1 style={{ color: '#0e0d0dff', fontWeight: 500 }}>
                     HRBS Login
                   </h1>
-                  <p style={{ color: 'rgba(12, 12, 12, 0.8)', fontFamily: 'Montserrat' }}>
+                  <p style={{ color: 'rgba(12, 12, 12, 0.8)' }}>
                     Welcome back! Login to continue
                   </p>
                 </div>
@@ -73,20 +76,19 @@ const Login = () => {
 
                   <CButton
                     color="primary"
-                    className="w-100 py-3 fw-semibold"
+                    className="w-100 py-3"
                     style={{
-                      background: 'linear-gradient(90deg, #5c6bc0 0%, #3f51b5 100%)',
+                      background: 'linear-gradient(90deg, #5f8ed0ff 0%, #4a5dcaff 100%)',
                       border: 'none',
                       borderRadius: '1px',
-                      fontSize: '1.3rem',
-                      fontFamily: 'Montserrat',
+                      fontSize: '1.4rem',
                     }}
                   >
                     Login
                   </CButton>
 
                   <div className="text-center mt-4">
-                    <small style={{ color: 'rgba(11, 11, 11, 0.8)', fontFamily: 'Montserrat' }}>
+                    <small style={{ color: 'rgba(11, 11, 11, 0.8)' }}>
                       HRBS – Empowering Human Resource Excellence
                     </small>
                   </div>
