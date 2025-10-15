@@ -1,6 +1,5 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-
 import {
   CButton,
   CCard,
@@ -14,11 +13,11 @@ import {
   CRow,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilLockLocked, cilUser } from '@coreui/icons'
+import { cilEnvelopeOpen } from '@coreui/icons'
 import './Login.css'
 import bgImage from '../../../assets/images/background-login1.jpeg'
 
-const Login = () => {
+const ForgotPassword = () => {
   return (
     <div
       className="min-vh-100 d-flex flex-row align-items-center justify-content-center"
@@ -34,60 +33,53 @@ const Login = () => {
           <CCol md={10} lg={8} xl={6}>
             <CCard
               className="glass-card p-5 border-0"
-              style={{ fontFamily: 'Poppins, sans-serif' }} // 👈 Changed font
+              style={{ fontFamily: 'Poppins, sans-serif' }}
             >
               <CCardBody>
                 <div className="text-center mb-4">
-                 <h1 style={{ color: '#0e0d0dff', fontWeight: 500 }}>
-                    HRBS Login
+                  <h1 style={{ color: '#0e0d0dff', fontWeight: 500 }}>
+                    Forgot Password
                   </h1>
                   <p style={{ color: 'rgba(12, 12, 12, 0.8)' }}>
-                    Welcome back! Login to continue
+                    Enter your email to reset your password
                   </p>
                 </div>
 
                 <CForm>
                   <CInputGroup className="mb-4">
                     <CInputGroupText className="glass-input-icon">
-                      <CIcon icon={cilUser} style={{ color: '#fff' }} />
+                      <CIcon icon={cilEnvelopeOpen} style={{ color: '#fff' }} />
                     </CInputGroupText>
                     <CFormInput
-                      placeholder="Username or Email"
-                      autoComplete="username"
+                      type="email"
+                      placeholder="Email"
+                      autoComplete="email"
                       className="glass-input"
+                      required
                     />
                   </CInputGroup>
 
-                  <CInputGroup className="mb-4">
-                    <CInputGroupText className="glass-input-icon">
-                      <CIcon icon={cilLockLocked} style={{ color: '#fff' }} />
-                    </CInputGroupText>
-                    <CFormInput
-                      type="password"
-                      placeholder="Password"
-                      autoComplete="current-password"
-                      className="glass-input"
-                    />
-                  </CInputGroup>
+                  <div className="d-grid mt-4">
+                    <CButton
+                      color="primary"
+                      className="w-100 py-3"
+                      style={{
+                        background: 'linear-gradient(90deg, #5f8ed0ff 0%, #4a5dcaff 100%)',
+                        border: 'none',
+                        borderRadius: '1px',
+                        fontSize: '1.3rem',
+                        marginTop: '20px'
+                      }}
+                    >
+                      Send Reset Link
+                    </CButton>
+                  </div>
 
-                  <div className="d-flex justify-content-between align-items-center mb-4">
-  <Link to="/forgot-password" style={{ textDecoration: 'none', color: '#000000ff' }}>
-    Forgot Password?
-  </Link>
-</div>
-
-                  <CButton
-                    color="primary"
-                    className="w-100 py-3"
-                    style={{
-                      background: 'linear-gradient(90deg, #5f8ed0ff 0%, #4a5dcaff 100%)',
-                      border: 'none',
-                      borderRadius: '1px',
-                      fontSize: '1.4rem',
-                    }}
-                  >
-                    Login
-                  </CButton>
+                  <div className="text-center mt-3">
+                    <Link to="/login" style={{ textDecoration: 'none', color: '#000000ff' }}>
+                      Back to Login
+                    </Link>
+                  </div>
 
                   <div className="text-center mt-4">
                     <small style={{ color: 'rgba(11, 11, 11, 0.8)' }}>
@@ -104,4 +96,4 @@ const Login = () => {
   )
 }
 
-export default Login
+export default ForgotPassword
