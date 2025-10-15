@@ -2,13 +2,13 @@
   "name": "@coreui/coreui-free-react-admin-template",
   "version": "5.5.0",
   "description": "CoreUI Free React Admin Template",
-  "homepage": ".",
+  "homepage": "http://.",
   "bugs": {
     "url": "https://github.com/coreui/coreui-free-react-admin-template/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:coreui/coreui-free-react-admin-template.git"
+    "url": "git+ssh://git@github.com/coreui/coreui-free-react-admin-template.git"
   },
   "license": "MIT",
   "author": "The CoreUI Team (https://github.com/orgs/coreui/people)",
@@ -27,11 +27,17 @@
     "@coreui/react-chartjs": "^3.0.0",
     "@coreui/utils": "^2.0.2",
     "@popperjs/core": "^2.11.8",
+    "bcryptjs": "^3.0.2",
     "chart.js": "^4.5.0",
     "classnames": "^2.5.1",
     "core-js": "^3.45.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
     "echarts": "^5.6.0",
     "echarts-for-react": "^3.0.2",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "pg": "^8.16.3",
     "prop-types": "^15.8.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
@@ -55,5 +61,7 @@
     "prettier": "3.6.2",
     "sass": "^1.90.0",
     "vite": "^7.1.0"
-  }
+  },
+  "main": ".prettierrc.js",
+  "keywords": []
 }

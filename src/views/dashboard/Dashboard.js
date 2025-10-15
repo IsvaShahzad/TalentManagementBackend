@@ -167,7 +167,7 @@ const Dashboard = () => {
                           strokeWidth={1}
                           strokeOpacity={0.3}
                           fill="url(#colorPlaced)"
-                          activeDot={{ r: 6, fill: '#4CAF50', stroke: '#fff', strokeWidth: 2 }} 
+                            activeDot={{ r: 6, fill: '#4CAF50', stroke: '#fff', strokeWidth: 2 }} 
 
                         />
                         <Area
@@ -177,7 +177,7 @@ const Dashboard = () => {
                           strokeWidth={1}
                           strokeOpacity={0.3}
                           fill="url(#colorPending)"
-                          activeDot={{ r: 6, fill: '#FFC107', stroke: '#fff', strokeWidth: 2 }}
+                            activeDot={{ r: 6, fill: '#FFC107', stroke: '#fff', strokeWidth: 2 }}
 
                         />
                         <Area

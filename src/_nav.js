@@ -58,6 +58,13 @@ const _nav = [
     to: '/position-tracker',
     icon: <CIcon icon={cilBriefcase} customClassName="nav-icon" />,
   },
+  
+   {
+    component: CNavItem,
+    name: 'Users',
+    to: '/users',
+    icon: <CIcon icon={cilBriefcase} customClassName="nav-icon" />,
+  },
   {
     component: CNavItem,
     name: 'Activity',
