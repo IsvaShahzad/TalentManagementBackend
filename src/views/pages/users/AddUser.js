@@ -21,17 +21,17 @@ import {
   CAlert,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilLockLocked, cilUser, cilEnvelopeOpen } from '@coreui/icons'
+import { cilLockLocked, cilUser, cilEnvelopeOpen, cilLowVision } from '@coreui/icons'
 
 const generatePassword = (length = 10) => {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()'
+  const chars =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()'
   let pass = ''
   for (let i = 0; i < length; i++) {
     pass += chars.charAt(Math.floor(Math.random() * chars.length))
   }
   return pass
 }
-// ...all previous imports
 
 const AddUser = () => {
   const [name, setName] = useState('')
@@ -42,43 +42,60 @@ const AddUser = () => {
   const [users, setUsers] = useState([])
   const [showAlert, setShowAlert] = useState(false)
   const [alertMessage, setAlertMessage] = useState('')
-  const [suggestedPassword, setSuggestedPassword] = useState(generatePassword()) // new state
+  const [suggestedPassword, setSuggestedPassword] = useState(generatePassword())
+  const [showPassword, setShowPassword] = useState({}) // track visibility per user in table
 
-  // Update suggested password whenever autoGenerate is checked
   const handleAutoGenerateToggle = (checked) => {
     setAutoGenerate(checked)
     if (checked) {
       setSuggestedPassword(generatePassword())
-      setPassword('') // clear manual input
+      setPassword('')
     }
   }
+  const [alertColor, setAlertColor] = useState('success')
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
-    const finalPassword = autoGenerate ? suggestedPassword : password
 
-    const newUser = {
-      name,
-      email,
-      password: finalPassword,
-      role,
-      date: new Date().toLocaleString(),
-    }
+ const handleSubmit = (e) => {
+  e.preventDefault()
+  const finalPassword = autoGenerate ? suggestedPassword : password
 
-    setUsers([...users, newUser])
+  // Check for duplicate email
+  const duplicate = users.find((user) => user.email === email)
+  if (duplicate) {
+  setAlertMessage(`User with email "${email}" already exists as ${duplicate.role}`)
+  setAlertColor('danger')  // <-- red alert
+  setShowAlert(true)
+  setTimeout(() => setShowAlert(false), 3000)
+  return
+}
 
-    // show alert
-    setAlertMessage(`User "${name}" created successfully as ${role}`)
-    setShowAlert(true)
-    setTimeout(() => setShowAlert(false), 3000)
 
-    // reset form
-    setName('')
-    setEmail('')
-    setPassword('')
-    setRole('Admin')
-    setAutoGenerate(true)
-    setSuggestedPassword(generatePassword())
+  const newUser = {
+    name,
+    email,
+    password: finalPassword,
+    role,
+    date: new Date().toLocaleString(),
+  }
+
+  setUsers([...users, newUser])
+  setAlertMessage(`User "${name}" created successfully as ${role}`)
+  setAlertColor('success') // <-- success alert stays green
+  setShowAlert(true)
+  setTimeout(() => setShowAlert(false), 3000)
+
+  // Reset form
+  setName('')
+  setEmail('')
+  setPassword('')
+  setRole('Admin')
+  setAutoGenerate(true)
+  setSuggestedPassword(generatePassword())
+}
+
+
+  const togglePasswordVisibility = (idx) => {
+    setShowPassword({ ...showPassword, [idx]: !showPassword[idx] })
   }
 
   return (
@@ -86,7 +103,7 @@ const AddUser = () => {
       <CContainer>
         <CRow className="justify-content-center mb-4">
           <CCol md={9} lg={7} xl={6}>
-            <CCard className="mx-4">
+            <CCard className="mx-4 shadow-sm rounded">
               <CCardBody className="p-4">
                 <CForm onSubmit={handleSubmit}>
                   <h1>Add New User</h1>
@@ -94,7 +111,6 @@ const AddUser = () => {
 
                   {showAlert && <CAlert color="success">{alertMessage}</CAlert>}
 
-                  {/* Name */}
                   <CInputGroup className="mb-3">
                     <CInputGroupText>
                       <CIcon icon={cilUser} />
@@ -107,7 +123,6 @@ const AddUser = () => {
                     />
                   </CInputGroup>
 
-                  {/* Email */}
                   <CInputGroup className="mb-3">
                     <CInputGroupText>
                       <CIcon icon={cilEnvelopeOpen} />
@@ -121,7 +136,6 @@ const AddUser = () => {
                     />
                   </CInputGroup>
 
-                  {/* Role */}
                   <CInputGroup className="mb-3">
                     <CInputGroupText>Role</CInputGroupText>
                     <CFormSelect value={role} onChange={(e) => setRole(e.target.value)}>
@@ -131,13 +145,12 @@ const AddUser = () => {
                     </CFormSelect>
                   </CInputGroup>
 
-                  {/* Password */}
                   <CInputGroup className="mb-3">
                     <CInputGroupText>
                       <CIcon icon={cilLockLocked} />
                     </CInputGroupText>
                     <CFormInput
-                      type="password"
+                      type={autoGenerate ? 'text' : 'password'}
                       placeholder="Password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
@@ -146,7 +159,6 @@ const AddUser = () => {
                     />
                   </CInputGroup>
 
-                  {/* Auto-generate password toggle */}
                   <CFormCheck
                     type="checkbox"
                     id="autoGeneratePassword"
@@ -155,18 +167,18 @@ const AddUser = () => {
                     onChange={(e) => handleAutoGenerateToggle(e.target.checked)}
                   />
 
-                  {/* Suggested password box */}
                   {autoGenerate && (
-                    <div
-                      className="mt-2 p-2 bg-light border rounded"
-                      style={{ fontFamily: 'monospace' }}
-                    >
+                    <div className="mt-2 p-2 bg-light border rounded" style={{ fontFamily: 'monospace' }}>
                       Suggested Password: <strong>{suggestedPassword}</strong>
                     </div>
                   )}
 
                   <div className="d-grid mt-4">
-                    <CButton color="success" type="submit">
+                    <CButton
+                      color="primary"
+                      type="submit"
+                      style={{ fontWeight: 500, fontSize: '1.1rem' }}
+                    >
                       Add User
                     </CButton>
                   </div>
@@ -176,11 +188,10 @@ const AddUser = () => {
           </CCol>
         </CRow>
 
-        {/* Users Table */}
         {users.length > 0 && (
           <CRow className="justify-content-center">
             <CCol md={12}>
-              <CCard className="mx-4">
+              <CCard className="mx-4 shadow-sm rounded">
                 <CCardBody className="p-4">
                   <h2>Added Users</h2>
                   <CTable striped hover responsive>
@@ -199,17 +210,23 @@ const AddUser = () => {
                           <CTableDataCell>{user.name}</CTableDataCell>
                           <CTableDataCell>{user.email}</CTableDataCell>
                           <CTableDataCell>{user.role}</CTableDataCell>
-                          <CTableDataCell>
+                          <CTableDataCell className="d-flex align-items-center">
                             <span
                               style={{
                                 background: '#f0f0f0',
                                 padding: '4px 8px',
                                 borderRadius: '4px',
                                 fontFamily: 'monospace',
+                                marginRight: '8px',
                               }}
                             >
-                              {user.password}
+                              {showPassword[idx] ? user.password : '*'.repeat(user.password.length)}
                             </span>
+                            <CIcon
+                              icon={cilLowVision}
+                              onClick={() => togglePasswordVisibility(idx)}
+                              style={{ cursor: 'pointer' }}
+                            />
                           </CTableDataCell>
                           <CTableDataCell>{user.date}</CTableDataCell>
                         </CTableRow>
@@ -227,4 +244,3 @@ const AddUser = () => {
 }
 
 export default AddUser
-
