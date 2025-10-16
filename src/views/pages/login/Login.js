@@ -34,11 +34,11 @@ const Login = () => {
           <CCol md={10} lg={8} xl={6}>
             <CCard
               className="glass-card p-5 border-0"
-              style={{ fontFamily: 'Poppins, sans-serif' }} // 👈 Changed font
+              style={{ fontFamily: 'Poppins, sans-serif' }}
             >
               <CCardBody>
                 <div className="text-center mb-4">
-                 <h1 style={{ color: '#0e0d0dff', fontWeight: 500 }}>
+                  <h1 style={{ color: '#0e0d0dff', fontWeight: 500 }}>
                     HRBS Login
                   </h1>
                   <p style={{ color: 'rgba(12, 12, 12, 0.8)' }}>
@@ -71,10 +71,10 @@ const Login = () => {
                   </CInputGroup>
 
                   <div className="d-flex justify-content-between align-items-center mb-4">
-  <Link to="/forgot-password" style={{ textDecoration: 'none', color: '#000000ff' }}>
-    Forgot Password?
-  </Link>
-</div>
+                    <Link to="/forgot-password" style={{ textDecoration: 'none', color: '#000000ff' }}>
+                      Forgot Password?
+                    </Link>
+                  </div>
 
                   <CButton
                     color="primary"
@@ -89,11 +89,30 @@ const Login = () => {
                     Login
                   </CButton>
 
-                  <div className="text-center mt-4">
+                  {/* HRBS Logo + Text */}
+                  <div
+                    className="text-center mt-4"
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'flex-start',
+                      gap: '8px'
+                    }}
+                  >
+                    <img
+                      src="/hrbs-logo.png"
+                      alt="HRBS Logo"
+                      style={{
+                        height: '20px',
+                        width: '20px',
+                        transform: 'translateY(-2px)' // move logo slightly up
+                      }}
+                    />
                     <small style={{ color: 'rgba(11, 11, 11, 0.8)' }}>
-                      HRBS – Empowering Human Resource Excellence
+                      HRBS –  Your Global Business Partner
                     </small>
                   </div>
+
                 </CForm>
               </CCardBody>
             </CCard>

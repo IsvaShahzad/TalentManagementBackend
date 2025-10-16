@@ -81,11 +81,30 @@ const ForgotPassword = () => {
                     </Link>
                   </div>
 
-                  <div className="text-center mt-4">
+                  {/* HRBS Logo + Text */}
+                  <div
+                    className="text-center mt-4"
+                    style={{
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'flex-start',
+                      gap: '8px'
+                    }}
+                  >
+                    <img
+                      src="/hrbs-logo.png"
+                      alt="HRBS Logo"
+                      style={{
+                        height: '20px',
+                        width: '20px',
+                        transform: 'translateY(-2px)' // move logo slightly up
+                      }}
+                    />
                     <small style={{ color: 'rgba(11, 11, 11, 0.8)' }}>
                       HRBS – Empowering Human Resource Excellence
                     </small>
                   </div>
+
                 </CForm>
               </CCardBody>
             </CCard>

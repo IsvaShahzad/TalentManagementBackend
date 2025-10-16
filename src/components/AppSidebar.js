@@ -1,7 +1,7 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import './AppSidebar.css'
-import sidebarLogo from 'src/assets/images/sidebarlogo.jpeg'
+import sidebarLogo from 'src/assets/images/side-logo.png'
 
 
 
@@ -13,12 +13,10 @@ import {
   CSidebarHeader,
   CSidebarToggler,
 } from '@coreui/react'
-import CIcon from '@coreui/icons-react'
 
 import { AppSidebarNav } from './AppSidebarNav'
 
-import { logo } from 'src/assets/brand/logo'
-import { sygnet } from 'src/assets/brand/sygnet'
+
 
 // sidebar nav config
 import navigation from '../_nav'
@@ -30,27 +28,26 @@ const AppSidebar = () => {
 
   return (
     <CSidebar
-      className="border-end"
-      position="fixed"
-      unfoldable={unfoldable}
-      visible={sidebarShow}
-      onVisibleChange={(visible) => {
-        dispatch({ type: 'set', sidebarShow: visible })
-      }}
-    >
+  className="border-end no-scrollbar"
+  position="fixed"
+  unfoldable={unfoldable}
+  visible={sidebarShow}
+  onVisibleChange={(visible) => {
+    dispatch({ type: 'set', sidebarShow: visible })
+  }}
+>
+
       <CSidebarHeader className="border-bottom">
         <CSidebarBrand to="/">
   <img
     className="sidebar-brand-full"
     src={sidebarLogo}
     alt="Logo"
-    height={32}
   />
   <img
     className="sidebar-brand-narrow"
     src={sidebarLogo}
     alt="Logo"
-    height={32}
   />
 </CSidebarBrand>
 
