@@ -1,6 +1,8 @@
 import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import './AppSidebar.css'
+import sidebarLogo from 'src/assets/images/sidebarlogo.jpeg'
+
 
 
 import {
@@ -38,9 +40,20 @@ const AppSidebar = () => {
     >
       <CSidebarHeader className="border-bottom">
         <CSidebarBrand to="/">
-          <CIcon customClassName="sidebar-brand-full" icon={logo} height={32} />
-          <CIcon customClassName="sidebar-brand-narrow" icon={sygnet} height={32} />
-        </CSidebarBrand>
+  <img
+    className="sidebar-brand-full"
+    src={sidebarLogo}
+    alt="Logo"
+    height={32}
+  />
+  <img
+    className="sidebar-brand-narrow"
+    src={sidebarLogo}
+    alt="Logo"
+    height={32}
+  />
+</CSidebarBrand>
+
         <CCloseButton
           className="d-lg-none"
           dark

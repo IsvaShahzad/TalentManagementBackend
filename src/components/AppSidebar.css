@@ -8,12 +8,13 @@
 
 /* Active (selected) state */
 .sidebar-nav .nav-link.active .nav-icon {
-  color: #6f42c1 !important; /* purple */
+  color: #4e72cb !important; /* purple */
   transform: scale(1.15); /* slightly larger to emphasize selection */
 }
 
 /* Hover state */
 .sidebar-nav .nav-link:hover .nav-icon {
-  color: #6f42c1;
+  color: #24349c;
   transform: scale(1.1);
 }
+
