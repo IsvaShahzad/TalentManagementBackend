@@ -101,7 +101,7 @@ const ForgotPassword = () => {
                       }}
                     />
                     <small style={{ color: 'rgba(11, 11, 11, 0.8)' }}>
-                      HRBS – Empowering Human Resource Excellence
+                      HRBS – Your Global Business Partner
                     </small>
                   </div>
 
