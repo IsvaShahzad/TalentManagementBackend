@@ -102,17 +102,18 @@ const AddUser = () => {
               <CForm onSubmit={handleSubmit}>
                 <h1
                   style={{
-                    fontWeight: 500,
+                    fontWeight: 400,
                     color: '#1e293b',
                     textAlign: 'center',
-                    marginBottom: '0.5rem',
+                    marginBottom: '0.4rem',
+                    fontSize: '2.3rem'
                   }}
                 >
                   Add New User
                 </h1>
                 <p
                   className="text-body-secondary"
-                  style={{ textAlign: 'center', marginBottom: '1.5rem' }}
+                  style={{ textAlign: 'center', marginBottom: '1.5rem', fontSize: '0.9rem' }}
                 >
                   Fill details to create a new user
                 </p>
@@ -383,45 +384,163 @@ const AddUser = () => {
         </CCol>
       </CRow>
 
-      {/* Table Section */}
-      {users.length > 0 && (
-        <CRow className="justify-content-center">
-          <CCol md={10}>
-            <CCard
-              className="mx-4 border-0"
-              style={{ borderRadius: '25px', background: 'white' }}
+     {/* Table Section */}
+{users.length > 0 && (
+  <CRow className="justify-content-center">
+    <CCol md={10}>
+      <CCard
+        className="mx-4 border-0 shadow-sm"
+        style={{
+          borderRadius: '20px',
+          background: '#ffffff',
+        }}
+      >
+        <CCardBody className="p-4">
+          <h4
+            className="mb-4 text-center"
+            style={{
+              fontWeight: 500,
+              color: '#1e293b',
+              letterSpacing: '0.3px',
+              fontFamily: 'Poppins, sans-serif',
+              fontSize: '1.8rem'
+            }}
+          >
+            Created Users
+          </h4>
+
+          <div
+            style={{
+              borderRadius: '10px',
+              overflow: 'hidden',
+              border: '1px solid #e5e7eb',
+            }}
+          >
+            <CTable
+              responsive
+              align="middle"
+              className="mb-0"
+              hover
+              style={{
+                borderCollapse: 'collapse',
+                fontFamily: 'Inter, sans-serif',
+                fontSize: '0.95rem',
+              }}
             >
-              <CCardBody className="p-4">
-                <h4 className="mb-4 text-center" style={{ fontWeight: 600 }}>
-                  Created Users
-                </h4>
-                <CTable hover responsive>
-                  <CTableHead color="light">
-                    <CTableRow>
-                      <CTableHeaderCell>Name</CTableHeaderCell>
-                      <CTableHeaderCell>Email</CTableHeaderCell>
-                      <CTableHeaderCell>Password</CTableHeaderCell>
-                      <CTableHeaderCell>Role</CTableHeaderCell>
-                      <CTableHeaderCell>Date Created</CTableHeaderCell>
-                    </CTableRow>
-                  </CTableHead>
-                  <CTableBody>
-                    {users.map((user, index) => (
-                      <CTableRow key={index}>
-                        <CTableDataCell>{user.name}</CTableDataCell>
-                        <CTableDataCell>{user.email}</CTableDataCell>
-                        <CTableDataCell>{user.password}</CTableDataCell>
-                        <CTableDataCell>{user.role}</CTableDataCell>
-                        <CTableDataCell>{user.date}</CTableDataCell>
-                      </CTableRow>
-                    ))}
-                  </CTableBody>
-                </CTable>
-              </CCardBody>
-            </CCard>
-          </CCol>
-        </CRow>
-      )}
+              <CTableHead
+                style={{
+                  background: '#f9fafb',
+                  borderBottom: '1px solid #e5e7eb',
+                }}
+              >
+                <CTableRow>
+                  <CTableHeaderCell
+                    className="py-3 px-4"
+                    style={{
+                      fontWeight: 600,
+                      color: '#374151',
+                      fontSize: '0.89rem',
+                      borderBottom: '1px solid #e5e7eb',
+                      fontFamily: 'Poppins'
+                    }}
+                  >
+                    Name
+                  </CTableHeaderCell>
+                  <CTableHeaderCell
+                    className="py-3 px-4"
+                    style={{
+                      fontWeight: 600,
+                      color: '#374151',
+                      fontSize: '0.89rem',
+                      borderBottom: '1px solid #e5e7eb',
+                      fontFamily: 'Poppins'
+
+                    }}
+                  >
+                    Email
+                  </CTableHeaderCell>
+                  <CTableHeaderCell
+                    className="py-3 px-4"
+                    style={{
+                      fontWeight: 600,
+                      color: '#374151',
+                      fontSize: '0.89rem',
+                      borderBottom: '1px solid #e5e7eb',
+                      fontFamily: 'Poppins'
+                    }}
+                  >
+                    Password
+                  </CTableHeaderCell>
+                  <CTableHeaderCell
+                    className="py-3 px-4"
+                    style={{
+                      fontWeight: 600,
+                      color: '#374151',
+                      fontSize: '0.89rem',
+                      borderBottom: '1px solid #e5e7eb',
+                    }}
+                  >
+                    Role
+                  </CTableHeaderCell>
+                  <CTableHeaderCell
+                    className="py-3 px-4"
+                    style={{
+                      fontWeight: 600,
+                      color: '#374151',
+                      fontSize: '0.89rem',
+                      borderBottom: '1px solid #e5e7eb',
+                    }}
+                  >
+                    Date Created
+                  </CTableHeaderCell>
+                </CTableRow>
+              </CTableHead>
+
+              <CTableBody>
+                {users.map((user, index) => (
+                  <CTableRow
+                    key={index}
+                    style={{
+                      transition: 'background 0.2s ease',
+                      borderBottom: '1px solid #f1f5f9',
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.backgroundColor = '#f9fafb')
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.backgroundColor = 'white')
+                    }
+                  >
+                    <CTableDataCell className="py-3 px-4" style={{ color: '#111827' }}>
+                      {user.name}
+                    </CTableDataCell>
+                    <CTableDataCell className="py-3 px-4" style={{ color: '#4b5563' }}>
+                      {user.email}
+                    </CTableDataCell>
+                    <CTableDataCell
+                      className="py-3 px-4"
+                      style={{ color: '#6b7280', fontFamily: 'monospace' }}
+                    >
+                      {user.password}
+                    </CTableDataCell>
+                    <CTableDataCell className="py-3 px-4" style={{ color: '#374151' }}>
+                      {user.role}
+                    </CTableDataCell>
+                    <CTableDataCell className="py-3 px-4" style={{ color: '#6b7280' }}>
+                      {user.date}
+                    </CTableDataCell>
+                  </CTableRow>
+                ))}
+              </CTableBody>
+            </CTable>
+          </div>
+        </CCardBody>
+      </CCard>
+    </CCol>
+  </CRow>
+)}
+
+
     </CContainer>
   )
 }

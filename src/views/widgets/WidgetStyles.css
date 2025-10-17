@@ -12,12 +12,12 @@
 }
 
 .gradient-warning {
-  background: linear-gradient(160deg, #ffd56b 0%, #ffc75f 50%, #ffb74a 100%);
+  background: linear-gradient(160deg, #8ab9ea 0%, #8ab9ea 50%, #7fabdb 100%);
   color: #fff;
 }
 
 .gradient-danger {
-  background: linear-gradient(160deg, #ff6b81 0%, #ff8fab 50%, #ffb3c6 100%);
+  background: linear-gradient(160deg, #80f4f8 0%, #70dbdf 50%, #80f4f8 100%);
   color: #fff;
 }
 

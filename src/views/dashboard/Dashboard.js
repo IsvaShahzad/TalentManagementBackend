@@ -40,7 +40,7 @@ const Dashboard = () => {
     { name: "Waiting", value: 15 },
   ];
 
-  const COLORS = ["#619963ff", "#d55883ff", "#6cb3bcff"];
+  const COLORS = ["#6594ebff", "#76c8dbff", "#9dc6edff"];
 
   const [trafficData, setTrafficData] = useState([
     { month: "Jan", Placed: 300, Pending: 150, Completed: 120 },
