@@ -7,21 +7,19 @@ import {
   CContainer,
   CForm,
   CFormInput,
-  CInputGroup,
-  CInputGroupText,
   CRow,
   CFormCheck,
+  CFormSelect,
+  CAlert,
   CTable,
   CTableHead,
   CTableRow,
   CTableHeaderCell,
   CTableBody,
   CTableDataCell,
-  CFormSelect,
-  CAlert,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilLockLocked, cilUser, cilEnvelopeOpen, cilLowVision } from '@coreui/icons'
+import { cilLockLocked, cilUser, cilEnvelopeOpen } from '@coreui/icons'
 
 const generatePassword = (length = 10) => {
   const chars =
@@ -42,8 +40,8 @@ const AddUser = () => {
   const [users, setUsers] = useState([])
   const [showAlert, setShowAlert] = useState(false)
   const [alertMessage, setAlertMessage] = useState('')
+  const [alertColor, setAlertColor] = useState('success')
   const [suggestedPassword, setSuggestedPassword] = useState(generatePassword())
-  const [showPassword, setShowPassword] = useState({}) // track visibility per user in table
 
   const handleAutoGenerateToggle = (checked) => {
     setAutoGenerate(checked)
@@ -52,194 +50,379 @@ const AddUser = () => {
       setPassword('')
     }
   }
-  const [alertColor, setAlertColor] = useState('success')
 
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    const finalPassword = autoGenerate ? suggestedPassword : password
 
- const handleSubmit = (e) => {
-  e.preventDefault()
-  const finalPassword = autoGenerate ? suggestedPassword : password
+    const duplicate = users.find((user) => user.email === email)
+    if (duplicate) {
+      setAlertMessage(`User with email "${email}" already exists as ${duplicate.role}`)
+      setAlertColor('danger')
+      setShowAlert(true)
+      setTimeout(() => setShowAlert(false), 3000)
+      return
+    }
 
-  // Check for duplicate email
-  const duplicate = users.find((user) => user.email === email)
-  if (duplicate) {
-  setAlertMessage(`User with email "${email}" already exists as ${duplicate.role}`)
-  setAlertColor('danger')  // <-- red alert
-  setShowAlert(true)
-  setTimeout(() => setShowAlert(false), 3000)
-  return
-}
+    const newUser = {
+      name,
+      email,
+      password: finalPassword,
+      role,
+      date: new Date().toLocaleString(),
+    }
 
+    setUsers([...users, newUser])
+    setAlertMessage(`User "${name}" created successfully as ${role}`)
+    setAlertColor('success')
+    setShowAlert(true)
+    setTimeout(() => setShowAlert(false), 3000)
 
-  const newUser = {
-    name,
-    email,
-    password: finalPassword,
-    role,
-    date: new Date().toLocaleString(),
-  }
-
-  setUsers([...users, newUser])
-  setAlertMessage(`User "${name}" created successfully as ${role}`)
-  setAlertColor('success') // <-- success alert stays green
-  setShowAlert(true)
-  setTimeout(() => setShowAlert(false), 3000)
-
-  // Reset form
-  setName('')
-  setEmail('')
-  setPassword('')
-  setRole('Admin')
-  setAutoGenerate(true)
-  setSuggestedPassword(generatePassword())
-}
-
-
-  const togglePasswordVisibility = (idx) => {
-    setShowPassword({ ...showPassword, [idx]: !showPassword[idx] })
+    setName('')
+    setEmail('')
+    setPassword('')
+    setRole('Admin')
+    setAutoGenerate(true)
+    setSuggestedPassword(generatePassword())
   }
 
   return (
-    <div className="bg-body-tertiary min-vh-100 d-flex flex-column align-items-center py-4">
-      <CContainer>
-        <CRow className="justify-content-center mb-4">
-          <CCol md={9} lg={7} xl={6}>
-            <CCard className="mx-4 shadow-sm rounded">
-              <CCardBody className="p-4">
-                <CForm onSubmit={handleSubmit}>
-                  <h1>Add New User</h1>
-                  <p className="text-body-secondary">Fill details to create a new user</p>
+    <CContainer style={{ fontFamily: 'Poppins, sans-serif' }}>
+      <CRow className="justify-content-center mb-5">
+        <CCol md={9} lg={7} xl={6}>
+          <CCard
+            className="mx-4 border-0"
+            style={{
+              borderRadius: '40px',
+              background: 'white',
+              boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)',
+            }}
+          >
+            <CCardBody className="p-5">
+              <CForm onSubmit={handleSubmit}>
+                <h1
+                  style={{
+                    fontWeight: 500,
+                    color: '#1e293b',
+                    textAlign: 'center',
+                    marginBottom: '0.5rem',
+                  }}
+                >
+                  Add New User
+                </h1>
+                <p
+                  className="text-body-secondary"
+                  style={{ textAlign: 'center', marginBottom: '1.5rem' }}
+                >
+                  Fill details to create a new user
+                </p>
 
-                  {showAlert && <CAlert color="success">{alertMessage}</CAlert>}
+                {showAlert && (
+                  <CAlert color={alertColor} className="text-center fw-medium">
+                    {alertMessage}
+                  </CAlert>
+                )}
 
-                  <CInputGroup className="mb-3">
-                    <CInputGroupText>
-                      <CIcon icon={cilUser} />
-                    </CInputGroupText>
-                    <CFormInput
-                      placeholder="Full Name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                    />
-                  </CInputGroup>
-
-                  <CInputGroup className="mb-3">
-                    <CInputGroupText>
-                      <CIcon icon={cilEnvelopeOpen} />
-                    </CInputGroupText>
-                    <CFormInput
-                      type="email"
-                      placeholder="Email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </CInputGroup>
-
-                  <CInputGroup className="mb-3">
-                    <CInputGroupText>Role</CInputGroupText>
-                    <CFormSelect value={role} onChange={(e) => setRole(e.target.value)}>
-                      <option value="Admin">Admin</option>
-                      <option value="Recruiter">Recruiter</option>
-                      <option value="Client">Client</option>
-                    </CFormSelect>
-                  </CInputGroup>
-
-                  <CInputGroup className="mb-3">
-                    <CInputGroupText>
-                      <CIcon icon={cilLockLocked} />
-                    </CInputGroupText>
-                    <CFormInput
-                      type={autoGenerate ? 'text' : 'password'}
-                      placeholder="Password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      disabled={autoGenerate}
-                      required={!autoGenerate}
-                    />
-                  </CInputGroup>
-
-                  <CFormCheck
-                    type="checkbox"
-                    id="autoGeneratePassword"
-                    label="Auto-generate password"
-                    checked={autoGenerate}
-                    onChange={(e) => handleAutoGenerateToggle(e.target.checked)}
-                  />
-
-                  {autoGenerate && (
-                    <div className="mt-2 p-2 bg-light border rounded" style={{ fontFamily: 'monospace' }}>
-                      Suggested Password: <strong>{suggestedPassword}</strong>
-                    </div>
-                  )}
-
-                  <div className="d-grid mt-4">
-                    <CButton
-                      color="primary"
-                      type="submit"
-                      style={{ fontWeight: 500, fontSize: '1.1rem' }}
-                    >
-                      Add User
-                    </CButton>
+                {/* Name Field */}
+                <div
+                  className="mb-4"
+                  style={{
+                    position: 'relative',
+                    height: '3.2rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '8px',
+                    background: 'white',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      paddingLeft: '14px',
+                      paddingRight: '12px',
+                      height: '100%',
+                    }}
+                  >
+                    <CIcon icon={cilUser} style={{ color: '#326396ff', fontSize: '18px' }} />
+                    <div
+                      style={{
+                        width: '1px',
+                        height: '60%',
+                        backgroundColor: '#e2e8f0',
+                        marginLeft: '10px',
+                      }}
+                    ></div>
                   </div>
-                </CForm>
+
+                  <CFormInput
+                    placeholder="Full Name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    required
+                    style={{
+                      fontSize: '1rem',
+                      padding: '0.8rem 1rem',
+                      border: 'none',
+                      outline: 'none',
+                      background: 'transparent',
+                      fontFamily: 'Poppins',
+                    }}
+                  />
+                </div>
+
+                {/* Email Field */}
+                <div
+                  className="mb-4"
+                  style={{
+                    position: 'relative',
+                    height: '3.2rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '8px',
+                    background: 'white',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      paddingLeft: '14px',
+                      paddingRight: '12px',
+                      height: '100%',
+                    }}
+                  >
+                    <CIcon
+                      icon={cilEnvelopeOpen}
+                      style={{ color: '#326396ff', fontSize: '18px' }}
+                    />
+                    <div
+                      style={{
+                        width: '1px',
+                        height: '60%',
+                        backgroundColor: '#e2e8f0',
+                        marginLeft: '10px',
+                      }}
+                    ></div>
+                  </div>
+
+                  <CFormInput
+                    type="email"
+                    placeholder="Email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                    style={{
+                      fontSize: '1rem',
+                      padding: '0.8rem 1rem',
+                      border: 'none',
+                      outline: 'none',
+                      background: 'transparent',
+                      fontFamily: 'Poppins',
+                    }}
+                  />
+                </div>
+
+                {/* Role Dropdown */}
+                <div
+                  className="mb-4"
+                  style={{
+                    position: 'relative',
+                    height: '3.2rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    border: '1px solid #e2e8f0',
+                    borderRadius: '8px',
+                    background: 'white',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      paddingLeft: '14px',
+                      paddingRight: '12px',
+                      height: '100%',
+                    }}
+                  >
+                    <CIcon icon={cilUser} style={{ color: '#326396ff', fontSize: '18px' }} />
+                    <div
+                      style={{
+                        width: '1px',
+                        height: '60%',
+                        backgroundColor: '#e2e8f0',
+                        marginLeft: '10px',
+                      }}
+                    ></div>
+                  </div>
+
+                  <CFormSelect
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    style={{
+                      fontSize: '1rem',
+                      padding: '0.8rem 1rem',
+                      border: 'none',
+                      outline: 'none',
+                      background: 'transparent',
+                      fontFamily: 'Poppins',
+                    }}
+                  >
+                    <option value="Admin">Admin</option>
+                    <option value="Recruiter">Recruiter</option>
+                    <option value="Client">Client</option>
+                  </CFormSelect>
+                </div>
+
+                {/* Password Field */}
+                <div
+                  className="mb-4"
+                  style={{
+                    position: 'relative',
+                    height: '3.2rem',
+                    display: 'flex',
+                    alignItems: 'center',
+                    border: `1px solid ${autoGenerate ? '#d1d5db' : '#e2e8f0'}`,
+                    borderRadius: '8px',
+                    background: autoGenerate ? '#f9fafb' : 'white',
+                    opacity: autoGenerate ? 0.7 : 1,
+                    transition: 'all 0.3s ease',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      paddingLeft: '14px',
+                      paddingRight: '12px',
+                      height: '100%',
+                    }}
+                  >
+                    <CIcon
+                      icon={cilLockLocked}
+                      style={{
+                        color: autoGenerate ? '#94a3b8' : '#326396ff',
+                        fontSize: '18px',
+                      }}
+                    />
+                    <div
+                      style={{
+                        width: '1px',
+                        height: '60%',
+                        backgroundColor: '#e2e8f0',
+                        marginLeft: '10px',
+                      }}
+                    ></div>
+                  </div>
+
+                  <CFormInput
+                    type={autoGenerate ? 'text' : 'password'}
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required={!autoGenerate}
+                    disabled={autoGenerate}
+                    style={{
+                      fontSize: '1rem',
+                      padding: '0.8rem 1rem',
+                      border: 'none',
+                      outline: 'none',
+                      background: 'transparent',
+                      fontFamily: 'Poppins',
+                      flex: 1,
+                      color: autoGenerate ? '#6b7280' : '#000000',
+                    }}
+                  />
+                </div>
+
+                {/* Auto-generate checkbox */}
+                <CFormCheck
+                  type="checkbox"
+                  id="autoGeneratePassword"
+                  label="Auto-generate password"
+                  checked={autoGenerate}
+                  onChange={(e) => handleAutoGenerateToggle(e.target.checked)}
+                  className="mb-3"
+                />
+
+                {autoGenerate && (
+                  <div
+                    className="mt-3 p-3 border rounded text-center"
+                    style={{
+                      fontFamily: 'monospace',
+                      background: '#f9fafb',
+                      fontSize: '0.95rem',
+                    }}
+                  >
+                    Suggested Password: <strong>{suggestedPassword}</strong>
+                  </div>
+                )}
+
+                <div className="d-grid mt-4">
+                  <CButton
+                    color="primary"
+                    type="submit"
+                    style={{
+                      fontWeight: 500,
+                      fontSize: '1.1rem',
+                      borderRadius: '1px',
+                      padding: '0.85rem',
+                      background: 'linear-gradient(135deg, #5f8ed0, #4a5dca)',
+                      border: 'none',
+                      fontFamily: 'Poppins',
+                    }}
+                  >
+                    Add User
+                  </CButton>
+                </div>
+              </CForm>
+            </CCardBody>
+          </CCard>
+        </CCol>
+      </CRow>
+
+      {/* Table Section */}
+      {users.length > 0 && (
+        <CRow className="justify-content-center">
+          <CCol md={10}>
+            <CCard
+              className="mx-4 border-0"
+              style={{ borderRadius: '25px', background: 'white' }}
+            >
+              <CCardBody className="p-4">
+                <h4 className="mb-4 text-center" style={{ fontWeight: 600 }}>
+                  Created Users
+                </h4>
+                <CTable hover responsive>
+                  <CTableHead color="light">
+                    <CTableRow>
+                      <CTableHeaderCell>Name</CTableHeaderCell>
+                      <CTableHeaderCell>Email</CTableHeaderCell>
+                      <CTableHeaderCell>Password</CTableHeaderCell>
+                      <CTableHeaderCell>Role</CTableHeaderCell>
+                      <CTableHeaderCell>Date Created</CTableHeaderCell>
+                    </CTableRow>
+                  </CTableHead>
+                  <CTableBody>
+                    {users.map((user, index) => (
+                      <CTableRow key={index}>
+                        <CTableDataCell>{user.name}</CTableDataCell>
+                        <CTableDataCell>{user.email}</CTableDataCell>
+                        <CTableDataCell>{user.password}</CTableDataCell>
+                        <CTableDataCell>{user.role}</CTableDataCell>
+                        <CTableDataCell>{user.date}</CTableDataCell>
+                      </CTableRow>
+                    ))}
+                  </CTableBody>
+                </CTable>
               </CCardBody>
             </CCard>
           </CCol>
         </CRow>
-
-        {users.length > 0 && (
-          <CRow className="justify-content-center">
-            <CCol md={12}>
-              <CCard className="mx-4 shadow-sm rounded">
-                <CCardBody className="p-4">
-                  <h2>Added Users</h2>
-                  <CTable striped hover responsive>
-                    <CTableHead>
-                      <CTableRow>
-                        <CTableHeaderCell>Name</CTableHeaderCell>
-                        <CTableHeaderCell>Email</CTableHeaderCell>
-                        <CTableHeaderCell>Role</CTableHeaderCell>
-                        <CTableHeaderCell>Password</CTableHeaderCell>
-                        <CTableHeaderCell>Date Added</CTableHeaderCell>
-                      </CTableRow>
-                    </CTableHead>
-                    <CTableBody>
-                      {users.map((user, idx) => (
-                        <CTableRow key={idx}>
-                          <CTableDataCell>{user.name}</CTableDataCell>
-                          <CTableDataCell>{user.email}</CTableDataCell>
-                          <CTableDataCell>{user.role}</CTableDataCell>
-                          <CTableDataCell className="d-flex align-items-center">
-                            <span
-                              style={{
-                                background: '#f0f0f0',
-                                padding: '4px 8px',
-                                borderRadius: '4px',
-                                fontFamily: 'monospace',
-                                marginRight: '8px',
-                              }}
-                            >
-                              {showPassword[idx] ? user.password : '*'.repeat(user.password.length)}
-                            </span>
-                            <CIcon
-                              icon={cilLowVision}
-                              onClick={() => togglePasswordVisibility(idx)}
-                              style={{ cursor: 'pointer' }}
-                            />
-                          </CTableDataCell>
-                          <CTableDataCell>{user.date}</CTableDataCell>
-                        </CTableRow>
-                      ))}
-                    </CTableBody>
-                  </CTable>
-                </CCardBody>
-              </CCard>
-            </CCol>
-          </CRow>
-        )}
-      </CContainer>
-    </div>
+      )}
+    </CContainer>
   )
 }
 
