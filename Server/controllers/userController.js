@@ -1,6 +1,8 @@
 import { prisma } from "../config/prismaConfig.js";
 import asyncHandler from "express-async-handler";
 import { validate as isUuid } from "uuid";
+import crypto from "crypto";
+
 
 /* ===========================
    CREATE USER
@@ -176,6 +178,33 @@ export const updateUser = asyncHandler(async (req, res) => {
   });
 });
 
+
+/* ===========================
+   FORGOT PASSWORD
+=========================== */
+export const forgotPassword = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) return res.status(400).json({ message: "Email is required" });
+
+  const user = await prisma.user.findUnique({ where: { email } });
+
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  // Generate a token just for sending the email (not saving in DB)
+  const resetToken = crypto.randomBytes(32).toString("hex");
+
+  // Create reset link
+  const resetLink = `http://localhost:3000/reset-password?token=${resetToken}&email=${email}`;
+
+  // For now, log it
+  console.log("Reset Link:", resetLink);
+
+  // TODO: Send actual email here using nodemailer or any email service
+
+  res.status(200).json({ message: "Verification link sent! Check console for now." });
+});
+
 /* ===========================
    DELETE USER
 =========================== */
@@ -208,3 +237,29 @@ export const getAllUsers = asyncHandler(async (req, res) => {
     users,
   });
 });
+
+
+/* ===========================
+   RESET PASSWORD
+=========================== */
+export const resetPasswordRequest = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+
+  if (!email) return res.status(400).json({ message: "Email is required" });
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  const resetToken = crypto.randomBytes(32).toString("hex");
+
+  const resetLink = `http://localhost:3000/reset-password?token=${resetToken}&email=${email}`;
+
+  console.log("Reset Link:", resetLink);
+
+  res.status(200).json({
+    message: "Reset link generated! Check console for now.",
+    resetLink,
+  });
+});
+
+
