@@ -54,3 +54,46 @@ export const validatePassword = async (email, password) => {
     throw error;
   }
 };
+
+// ✅ Forgot password
+export const sendForgotPasswordLink = async (email) => {
+  try {
+    const response = await axios.post(`${API_BASE_URL}/forgot-password`, { email });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Create new user
+export const createUserApi = async (userData) => {
+  try {
+    const response = await axios.post("http://localhost:7000/api/user/register", userData);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || { message: "Server error" };
+  }
+};
+
+// Fetch all users
+// Corrected function
+export const getAllUsersApi = async () => {
+  try {
+    // 1. Removed the 'userData' variable from the .get() call
+    const response = await axios.get("http://localhost:7000/api/user/getAll");
+    
+    // 2. Return 'response.data' instead of 'res.data'
+    return response.data; // This should be { message, count, users }
+  } catch (err) {
+    console.error('Error fetching users:', err);
+    throw err;
+  }
+};
+
+
+//Get recruiters
+export const getUsersByRoleApi = async (role) => {
+  const res = await axios.post('http://localhost:7000/api/user/getUsersByRole', { role })
+  return res.data
+}
+
