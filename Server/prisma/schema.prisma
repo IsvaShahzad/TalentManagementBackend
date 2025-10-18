@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  user_id       String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  full_name     String
+  email         String          @unique
+  password_hash String
+  role          UserRole        @default(Recruiter)
+  createdAt     DateTime        @default(now()) @map("created_at")
+  isActive      Boolean         @default(true) @map("is_active")
+  Client        Client?
+  jobsPosted    Job[]           @relation("JobPostedBy")
+  loginActivity LoginActivity[]
+  Recruiter     Recruiter?
+}
+
+model LoginActivity {
+  login_id   String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String?    @map("user_id") @db.Uuid
+  eventType  EventType? @map("event_type")
+  occurredAt DateTime   @default(now()) @map("occurred_at")
+  user       User?      @relation(fields: [userId], references: [user_id])
+}
+
+model Recruiter {
+  recruiter_id String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId       String   @unique @map("user_id") @db.Uuid
+  employeeId   String?  @map("employee_id")
+  phone        String?
+  title        String?
+  updatedAt    DateTime @default(now()) @map("updated_at")
+  user         User     @relation(fields: [userId], references: [user_id])
+}
+
+model Client {
+  client_id  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String   @unique @map("user_id") @db.Uuid
+  employeeId String?  @map("employee_id")
+  phone      String?
+  title      String?
+  updatedAt  DateTime @default(now()) @map("updated_at")
+  user       User     @relation(fields: [userId], references: [user_id])
+}
+
+model Job {
+  job_id          String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title           String
+  description     String?
+  department      String?
+  location        String?
+  employment_type EmploymentType?
+  status          JobStatus       @default(Open)
+  posted_by       String?         @db.Uuid
+  created_at      DateTime        @default(now())
+  postedByUser    User?           @relation("JobPostedBy", fields: [posted_by], references: [user_id])
+}
+
+enum UserRole {
+  Admin
+  Recruiter
+  HR
+}
+
+enum EventType {
+  login
+  logout
+  failed_login
+}
+
+enum EmploymentType {
+  FullTime
+  PartTime
+  Internship
+  Contract
+}
+
+enum JobStatus {
+  Open
+  Closed
+  Paused
+}
+
+enum ApplicationStatus {
+  Applied
+  UnderReview
+  InterviewScheduled
+  Offered
+  Rejected
+}
+
+enum CandidateJobStatus {
+  submitted
+  shortlisted
+  interviewing
+  offered
+  placed
+  rejected
+}
+
+enum SubmissionOutcome {
+  no_response
+  rejected
+  interview
+  offer
+  placed
+}
+
+enum InterviewMode {
+  Online
+  Onsite
+  Phone
+}
+
+enum InterviewResult {
+  Pending
+  Passed
+  Failed
+}
+
+enum AuditAction {
+  INSERT
+  UPDATE
+  DELETE
+}
+
+enum NotifyFrequency {
+  none
+  daily
+  weekly
+}
