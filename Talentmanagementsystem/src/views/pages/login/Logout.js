@@ -1,16 +1,16 @@
-import { useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
+// import { useEffect } from 'react'
+// import { useNavigate } from 'react-router-dom'
 
-const Logout = () => {
-  const navigate = useNavigate()
+// const Logout = () => {
+//   const navigate = useNavigate()
 
-  useEffect(() => {
-    localStorage.removeItem('jwtToken')
-    localStorage.removeItem('user')
-    navigate('/login', { replace: true })
-  }, [navigate])
+//   useEffect(() => {
+//     localStorage.removeItem('jwtToken')
+//     localStorage.removeItem('user')
+//     navigate('/login', { replace: true })
+//   }, [navigate])
 
-  return null
-}
+//   return null
+// }
 
-export default Logout
+// export default Logout

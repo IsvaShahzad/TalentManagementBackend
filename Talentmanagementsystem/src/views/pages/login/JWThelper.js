@@ -1,10 +1,10 @@
-// src/helpers/jwtHelper.js
-import jwtEncode from 'jwt-encode'
+// src/views/login/JWThelper.js
+import jwt from 'jsonwebtoken';
 
-const JWT_SECRET = 'demo-secret'
+const SECRET_KEY = 'your_secret_key_here'; // replace with secure key later
 
 export const generateJWT = (payload) => {
-  const token = jwtEncode(payload, JWT_SECRET)
-  console.log('Generated JWT:', token) // prints in browser console
-  return token
-}
+  const token = jwt.sign(payload, SECRET_KEY, { expiresIn: '1h' });
+  console.log("JWT generated:", token); // prints in browser console
+  return token;
+};
