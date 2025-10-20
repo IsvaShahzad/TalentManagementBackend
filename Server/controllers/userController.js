@@ -57,7 +57,13 @@ export const getUserByEmail = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "User doesn't exist" });
   }
 
-  res.status(200).json(user);
+  res.status(200).json({
+    user:
+    {
+      email: user.email,
+      role: user.role,
+    }
+  });
 });
 
 /* ===========================
@@ -154,17 +160,47 @@ export const getUsersByRole = asyncHandler(async (req, res) => {
 /* ===========================
    UPDATE USER
 =========================== */
-export const updateUser = asyncHandler(async (req, res) => {
-  const { full_name, email, role } = req.body;
-  const { id } = req.params;
+// export const updateUser = asyncHandler(async (req, res) => {
+//   const { full_name, email, role } = req.body;
+//   const { id } = req.params;
 
-  const user = await prisma.user.findUnique({ where: { user_id: id } });
+//   const user = await prisma.user.findUnique({ where: { user_id: id } });
+//   if (!user) {
+//     return res.status(404).json({ message: "User not found" });
+//   }
+
+//   const updatedUser = await prisma.user.update({
+//     where: { user_id: id },
+//     data: {
+//       full_name: full_name ?? user.full_name,
+//       email: email ?? user.email,
+//       role: role ?? user.role,
+//     },
+//   });
+
+//   res.status(200).json({
+//     message: "User updated successfully",
+//     updatedUser,
+//   });
+// });
+
+/* ===========================
+   UPDATE USER BY EMAIL
+=========================== */
+export const updateUserByEmail = asyncHandler(async (req, res) => {
+  const { full_name, email, role, currentEmail } = req.body;
+
+  if (!currentEmail) {
+    return res.status(400).json({ message: "Current email is required" });
+  }
+
+  const user = await prisma.user.findUnique({ where: { email: currentEmail } });
   if (!user) {
     return res.status(404).json({ message: "User not found" });
   }
 
   const updatedUser = await prisma.user.update({
-    where: { user_id: id },
+    where: { email: currentEmail },
     data: {
       full_name: full_name ?? user.full_name,
       email: email ?? user.email,
@@ -184,39 +220,50 @@ export const updateUser = asyncHandler(async (req, res) => {
 =========================== */
 export const forgotPassword = asyncHandler(async (req, res) => {
   const { email } = req.body;
+  console.log("forgot password api");
+  if (!email) return res.status(400).json({ message: "Email is required" });
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  console.log("user checked");
+  if (!user) return res.status(404).json({ message: "User not found" });
+  //check role
+  if (user.role == "Admin" || user.role == "Recruiter") {
+    console.log("admin user");
+    return res.status(200).json({
+      // message: "User is admin",
+      role: user.role,
+    });
+  }
+  return res.status(200).json({
+    message: "Please contact your Admin for password reset. support@hrbs.com",
+    role: user.role,
+  })
+  // Generate a token just for sending the email (not saving in DB)
+  //const resetToken = crypto.randomBytes(32).toString("hex");
+
+  // Create reset link
+  //const resetLink = `http://localhost:3000/reset-password?token=${resetToken}&email=${email}`;
+
+  // For now, log it
+  //console.log("Reset Link:", resetLink);
+
+  // TODO: Send actual email here using nodemailer or any email service
+
+  //res.status(200).json({ message: "Verification link sent! Check console for now." });
+});
+
+/* ===========================
+   DELETE USER BY EMAIL
+=========================== */
+export const deleteUserByEmail = asyncHandler(async (req, res) => {
+  const { email } = req.body;
 
   if (!email) return res.status(400).json({ message: "Email is required" });
 
   const user = await prisma.user.findUnique({ where: { email } });
-
   if (!user) return res.status(404).json({ message: "User not found" });
 
-  // Generate a token just for sending the email (not saving in DB)
-  const resetToken = crypto.randomBytes(32).toString("hex");
-
-  // Create reset link
-  const resetLink = `http://localhost:3000/reset-password?token=${resetToken}&email=${email}`;
-
-  // For now, log it
-  console.log("Reset Link:", resetLink);
-
-  // TODO: Send actual email here using nodemailer or any email service
-
-  res.status(200).json({ message: "Verification link sent! Check console for now." });
-});
-
-/* ===========================
-   DELETE USER
-=========================== */
-export const deleteUser = asyncHandler(async (req, res) => {
-  const { id } = req.params;
-
-  const user = await prisma.user.findUnique({ where: { user_id: id } });
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
-  }
-
-  await prisma.user.delete({ where: { user_id: id } });
+  await prisma.user.delete({ where: { email } });
   res.status(200).json({ message: "User deleted successfully" });
 });
 
@@ -238,28 +285,45 @@ export const getAllUsers = asyncHandler(async (req, res) => {
   });
 });
 
+//DeleteRecruiter
+
+export const deleteRecruiter = asyncHandler(async (req, res) => {
+  const { email } = req.params;
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) return res.status(404).json({ message: "User not found" });
+  if (user.role !== "Recruiter") return res.status(403).json({ message: "User is not a Recruiter" });
+
+  await prisma.user.delete({ where: { email } });
+  res.status(200).json({ message: "Recruiter deleted successfully" });
+});
+
 
 /* ===========================
    RESET PASSWORD
 =========================== */
-export const resetPasswordRequest = asyncHandler(async (req, res) => {
-  const { email } = req.body;
-
+export const updatePassword = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+  console.log("getting reset data")
   if (!email) return res.status(400).json({ message: "Email is required" });
 
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) return res.status(404).json({ message: "User not found" });
 
-  const resetToken = crypto.randomBytes(32).toString("hex");
+  //const resetToken = crypto.randomBytes(32).toString("hex");
 
-  const resetLink = `http://localhost:3000/reset-password?token=${resetToken}&email=${email}`;
+  // const resetLink = `http://localhost:3000/reset-password?token=${resetToken}&email=${email}`;
 
-  console.log("Reset Link:", resetLink);
+  //console.log("Reset Link:", resetLink);
+
+  await prisma.user.update({
+    where: { email: email },
+    data: {
+      password_hash: password
+    },
+  });
 
   res.status(200).json({
-    message: "Reset link generated! Check console for now.",
-    resetLink,
+    message: "Password Reset Successful.",
   });
 });
-
-

@@ -65,7 +65,7 @@ model Job {
 enum UserRole {
   Admin
   Recruiter
-  HR
+  Client
 }
 
 enum EventType {

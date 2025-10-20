@@ -1,33 +1,41 @@
-    import express from 'express';
-    import { 
-    createUser, 
-    getUser, 
-    getUserRole, 
-    getUsersByRole, 
-    deleteUser, 
-    updateUser, 
-    getUserByEmail, 
-    getPassword, 
-    getAllUsers, 
+import express from 'express';
+import {
+    createUser,
+    getUser,
+    getUserRole,
+    getUsersByRole,
+    getUserByEmail,
+    getPassword,
+    getAllUsers,
     forgotPassword,
-    resetPasswordRequest
-    } from '../controllers/userController.js';
+    updatePassword,
+    updateUserByEmail,
+    deleteUserByEmail,
+    deleteRecruiter
+} from '../controllers/userController.js';
 
-    const router = express.Router();
+const router = express.Router();
 
-    // ✅ Routes
-    router.post("/register", createUser);
-    router.get("/getUser/:id", getUser);
-    router.get("/getAll", getAllUsers); // 👈 NEW
-    router.post("/fetchUser", getUserByEmail);
-    router.post("/fetchPasswd", getPassword);
-    router.post("/getRole", getUserRole);
-    router.post("/getUsersByRole", getUsersByRole);
-    router.put("/userUpdate/:id", updateUser);
-    router.delete("/userDelete/:id", deleteUser);
-    router.post("/forgot-password", forgotPassword);
-    router.post('/reset', resetPasswordRequest);
+// ✅ Routes
+router.post("/register", createUser);
+router.get("/getUser/:id", getUser);
+router.get("/getAll", getAllUsers); // 👈 NEW
+router.delete("/userDeleteByEmail", deleteUserByEmail);
+router.post("/fetchUser", getUserByEmail);
+router.post("/fetchPasswd", getPassword);
+router.post("/getRole", getUserRole);
+router.post("/getUsersByRole", getUsersByRole);
+router.put("/userUpdateByEmail", updateUserByEmail);
+router.post("/forgot-password", forgotPassword);
+router.post("/reset-password", updatePassword);
 
 
 
-    export { router as userRoute };
+
+router.post('/reset-password', async (req) => {
+    console.log('Reset password payload:', req.body);
+    // continue logic here...
+});
+
+
+export { router as userRoute };
