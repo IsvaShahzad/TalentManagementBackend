@@ -2,25 +2,101 @@ import { prisma } from "../config/prismaConfig.js";
 import asyncHandler from "express-async-handler";
 import { validate as isUuid } from "uuid";
 import crypto from "crypto";
+import bcrypt from "bcryptjs";
+
 
 
 /* ===========================
    CREATE USER
 =========================== */
-export const createUser = asyncHandler(async (req, res) => {
-  const { email } = req.body;
+// export const createUser = asyncHandler(async (req, res) => {
+//   const { email } = req.body;
 
-  const userExists = await prisma.user.findUnique({ where: { email } });
-  if (userExists) {
-    return res.status(409).json({ message: "User already exists" });
+//   const userExists = await prisma.user.findUnique({ where: { email } });
+//   if (userExists) {
+//     return res.status(409).json({ message: "User already exists" });
+//   }
+
+//   const user = await prisma.user.create({ data: req.body });
+//   res.status(201).json({
+//     message: "User registered successfully",
+//     user,
+//   });
+// });
+
+
+//CREATE USER
+
+// export const createUser = asyncHandler(async (req, res) => {
+//   const { email, role: requestedRole } = req.body;
+
+//   // Check if user exists
+//   const userExists = await prisma.user.findUnique({ where: { email } });
+//   if (userExists) return res.status(409).json({ message: "User already exists" });
+
+//   // Map role to Prisma enum
+//   const validRoles = {
+//     admin: "Admin",
+//     recruiter: "Recruiter",
+//     client: "Client",
+//   };
+
+//   const role = requestedRole
+//     ? validRoles[requestedRole.toLowerCase()]
+//     : "Recruiter"; // default
+
+//   if (!role) {
+//     return res.status(400).json({ message: "Invalid role provided" });
+//   }
+
+//   // Create user
+//   const user = await prisma.user.create({
+//     data: {
+//       full_name: req.body.full_name,
+//       email,
+//       password_hash: req.body.password_hash,
+//       role, // always valid enum
+//     },
+//   });
+
+//   // If Client, create Client record
+//   if (role === "Client") {
+//     await prisma.client.create({ data: { userId: user.user_id } });
+//   }
+
+//   res.status(201).json({
+//     message: `User registered successfully as ${role}`,
+//     user,
+//   });
+// });
+
+
+export const createUser = asyncHandler(async (req, res) => {
+  const { full_name, email, password_hash, role } = req.body;
+
+  if (!full_name || !email || !password_hash || !role) {
+    return res.status(400).json({ message: "All fields are required" });
   }
 
-  const user = await prisma.user.create({ data: req.body });
-  res.status(201).json({
-    message: "User registered successfully",
-    user,
+  // Check if user exists
+  const existingUser = await prisma.user.findUnique({ where: { email } });
+  if (existingUser) {
+    return res.status(400).json({ message: "User already exists" });
+  }
+
+  const newUser = await prisma.user.create({
+    data: {
+      full_name,
+      email,
+      password_hash, // plain string, can include special characters
+      role,
+    },
   });
+
+  res.status(201).json({ message: "User created successfully", user: newUser });
 });
+
+
 
 /* ===========================
    GET USER BY ID
@@ -78,7 +154,11 @@ export const getPassword = asyncHandler(async (req, res) => {
 
   const user = await prisma.user.findUnique({ where: { email } });
 
-  if (!user) return res.status(404).json({ message: "User not found" });
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
+
+  // Direct string comparison
   if (user.password_hash !== password) {
     return res.status(401).json({ message: "Incorrect password" });
   }
@@ -93,6 +173,90 @@ export const getPassword = asyncHandler(async (req, res) => {
     },
   });
 });
+
+
+//GET LOGGED IN USERS
+
+
+// Record login
+export const recordLogin = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) return res.status(404).json({ message: "User not found" });
+  const loginActivity = await prisma.loginActivity.create({
+    data: { userId: user.user_id, eventType: "login" },
+  });
+  res.status(201).json({ message: "Login recorded", loginActivity });
+});
+
+// Record logout
+export const recordLogout = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) return res.status(404).json({ message: "User not found" });
+  const logoutActivity = await prisma.loginActivity.create({
+    data: { userId: user.user_id, eventType: "logout" },
+  });
+  res.status(201).json({ message: "Logout recorded", logoutActivity });
+});
+
+// Fetch login activities
+export const getLoginActivities = asyncHandler(async (req, res) => {
+  const activities = await prisma.loginActivity.findMany({
+    where: { eventType: "login" },
+    include: { user: { select: { full_name: true, email: true, role: true } } },
+    orderBy: { occurredAt: "desc" },
+  });
+  res.status(200).json(activities);
+});
+
+// Fetch logout activities
+export const getLogoutActivities = asyncHandler(async (req, res) => {
+  const activities = await prisma.loginActivity.findMany({
+    where: { eventType: "logout" },
+    include: { user: { select: { full_name: true, email: true, role: true } } },
+    orderBy: { occurredAt: "desc" },
+  });
+  res.status(200).json(activities);
+});
+
+
+
+//POST LOGGED IN USERS
+
+
+// POST /api/user/loginPost
+export const loginPostUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) return res.status(400).json({ message: "Email and password required" });
+
+  // Find the user
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  // Check password
+  if (user.password_hash !== password) {
+    return res.status(401).json({ message: "Incorrect password" });
+  }
+
+  // Record login activity (optional)
+  await prisma.loginActivity.create({
+    data: { userId: user.user_id, eventType: "login" },
+  });
+
+  res.status(200).json({
+    message: "Login successful",
+    user: {
+      user_id: user.user_id,
+      full_name: user.full_name,
+      email: user.email,
+      role: user.role,
+    },
+  });
+});
+
+
 
 /* ===========================
    GET USER ROLE
