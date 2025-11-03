@@ -8,17 +8,20 @@ datasource db {
 }
 
 model User {
-  user_id       String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  full_name     String
-  email         String          @unique
-  password_hash String
-  role          UserRole        @default(Recruiter)
-  createdAt     DateTime        @default(now()) @map("created_at")
-  isActive      Boolean         @default(true) @map("is_active")
-  Client        Client?
-  jobsPosted    Job[]           @relation("JobPostedBy")
-  loginActivity LoginActivity[]
-  Recruiter     Recruiter?
+  user_id                String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  full_name              String
+  email                  String                   @unique
+  password_hash          String
+  role                   UserRole                 @default(Recruiter)
+  createdAt              DateTime                 @default(now()) @map("created_at")
+  isActive               Boolean                  @default(true) @map("is_active")
+  Candidate              Candidate[]
+  CandidateStatusHistory CandidateStatusHistory[]
+  Client                 Client?
+  jobsPosted             Job[]                    @relation("JobPostedBy")
+  loginActivity          LoginActivity[]
+  Recruiter              Recruiter?
+  SavedSearch            SavedSearch[]
 }
 
 model LoginActivity {
@@ -40,13 +43,13 @@ model Recruiter {
 }
 
 model Client {
-  client_id  String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId     String   @unique @map("user_id") @db.Uuid
-  employeeId String?  @map("employee_id")
-  phone      String?
-  title      String?
-  updatedAt  DateTime @default(now()) @map("updated_at")
-  user       User     @relation(fields: [userId], references: [user_id])
+  client_id String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String   @unique @map("user_id") @db.Uuid
+  phone     String?
+  title     String?
+  updatedAt DateTime @default(now()) @map("updated_at")
+  company   String?
+  user      User     @relation(fields: [userId], references: [user_id])
 }
 
 model Job {
@@ -60,6 +63,58 @@ model Job {
   posted_by       String?         @db.Uuid
   created_at      DateTime        @default(now())
   postedByUser    User?           @relation("JobPostedBy", fields: [posted_by], references: [user_id])
+}
+
+model Candidate {
+  candidate_id           String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId                 String?                  @map("user_id") @db.Uuid
+  name                   String?
+  last_name              String?
+  email                  String?
+  phone                  String?                  @db.VarChar(50)
+  location               String?                  @db.VarChar(255)
+  industry               String?                  @db.VarChar(255)
+  experience_years       Float?
+  current_company        String?                  @db.VarChar(255)
+  current_title          String?                  @db.VarChar(255)
+  profileSummary         String?                  @map("profile_summary")
+  isActive               Boolean?                 @default(true) @map("is_active")
+  createdBy              String?                  @map("created_by") @db.Uuid
+  createdAt              DateTime?                @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt              DateTime?                @default(now()) @map("updated_at") @db.Timestamp(6)
+  resume_url             String?
+  resume_url_redacted    String?
+  parsed_resume_text     String?
+  parsed_resume_json     Json?
+  resume_tsv             Unsupported("tsvector")?
+  position_applied       String?
+  candidate_status       String?
+  candidateCreatedBy     User?                    @relation(fields: [createdBy], references: [user_id], onUpdate: NoAction, map: "fk_candidate_created_by")
+  CandidateStatusHistory CandidateStatusHistory[]
+
+  @@index([resume_tsv], map: "idx_candidate_resume_tsv", type: Gin)
+}
+
+model CandidateStatusHistory {
+  history_id    String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  candidate_id  String?          @db.Uuid
+  oldStatus     CandidateStatus? @map("old_status")
+  newStatus     CandidateStatus? @map("new_status")
+  changed_by    String?          @db.Uuid
+  changed_at    DateTime?        @default(now()) @db.Timestamp(6)
+  candidate     Candidate?       @relation(fields: [candidate_id], references: [candidate_id], onDelete: Cascade, onUpdate: NoAction)
+  changedByUser User?            @relation(fields: [changed_by], references: [user_id], onUpdate: NoAction, map: "fk_changed_by_user")
+}
+
+model SavedSearch {
+  savedsearch_id   String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id          String?   @db.Uuid
+  query            String?
+  filters          Json?
+  notify_frequency String?   @default("none")
+  last_notified_at DateTime? @db.Timestamptz(6)
+  created_at       DateTime? @default(now()) @db.Timestamptz(6)
+  user             User?     @relation(fields: [user_id], references: [user_id], onDelete: Cascade, onUpdate: NoAction, map: "saved_searches_user_id_fkey")
 }
 
 enum UserRole {
@@ -95,15 +150,6 @@ enum ApplicationStatus {
   Rejected
 }
 
-enum CandidateJobStatus {
-  submitted
-  shortlisted
-  interviewing
-  offered
-  placed
-  rejected
-}
-
 enum SubmissionOutcome {
   no_response
   rejected
@@ -134,4 +180,23 @@ enum NotifyFrequency {
   none
   daily
   weekly
+}
+
+enum CandidateStatus {
+  submitted
+  sourced
+  shortlisted
+  interviewing
+  offered
+  placed
+  rejected
+}
+
+enum CandidateJobStatus {
+  submitted
+  shortlisted
+  interviewing
+  offered
+  placed
+  rejected
 }

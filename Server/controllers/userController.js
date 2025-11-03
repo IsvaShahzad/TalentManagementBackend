@@ -71,9 +71,10 @@ import bcrypt from "bcryptjs";
 // });
 
 
-export const createUser = asyncHandler(async (req, res) => {
-  const { full_name, email, password_hash, role } = req.body;
+/*export const createUser = asyncHandler(async (req, res) => {
+  const { full_name, email, password_hash, role, company = '' } = req.body;
 
+  console.log("company", company)
   if (!full_name || !email || !password_hash || !role) {
     return res.status(400).json({ message: "All fields are required" });
   }
@@ -85,18 +86,78 @@ export const createUser = asyncHandler(async (req, res) => {
   }
 
   const newUser = await prisma.user.create({
-    data: {
-      full_name,
-      email,
-      password_hash, // plain string, can include special characters
-      role,
-    },
+    data: { full_name, email, password_hash, role },
   });
+  /*
+    if (role === 'Client' && company) {
+      await prisma.client.create({
+        data: { company, userId: newUser.user_id },
+      });
+    }*/
+/*
+if (role === 'Client') {
+ if (!company) {
+   return res.status(400).json({ message: "Company is required for Client users" });
+ }
+ await prisma.client.create({
+   data: { company, userId: newUser.user_id },
+ });
+}
 
-  res.status(201).json({ message: "User created successfully", user: newUser });
+res.status(201).json({ message: "User created successfully", user: newUser });
 });
 
+*/
+export const createUser = asyncHandler(async (req, res) => {
+  try {
+    const { full_name, email, password_hash, role, company } = req.body;
 
+    // Validate required fields
+    if (!full_name || !email || !password_hash || !role) {
+      return res.status(400).json({ message: "All fields are required" });
+    }
+
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ message: "User already exists" });
+    }
+
+    // Create the user
+    const newUser = await prisma.user.create({
+      data: { full_name, email, password_hash, role },
+    });
+
+    // If role is Client
+    if (role === "Client") {
+      // If no company name provided, set it to null
+      const companyValue = company && company.trim() !== "" ? company.trim() : null;
+
+      // Create a client record if company exists, otherwise skip
+      if (companyValue) {
+        await prisma.client.create({
+          data: {
+            company: companyValue,
+            userId: newUser.user_id,
+          },
+        });
+      } else {
+        console.warn(`Client user ${email} has no company provided — skipping client record.`);
+      }
+    }
+
+    res.status(201).json({
+      message: "User created successfully",
+      user: newUser,
+    });
+  } catch (error) {
+    console.error(" Error creating user: ", error);
+    res.status(500).json({
+      message: "Failed to create user",
+      error: error.message,
+    });
+  }
+});
 
 /* ===========================
    GET USER BY ID
@@ -351,31 +412,52 @@ export const getUsersByRole = asyncHandler(async (req, res) => {
 /* ===========================
    UPDATE USER BY EMAIL
 =========================== */
-export const updateUserByEmail = asyncHandler(async (req, res) => {
-  const { full_name, email, role, currentEmail } = req.body;
 
+export const updateUserByEmail = asyncHandler(async (req, res) => {
+  const { full_name, email, role, currentEmail, company } = req.body;
+  console.log("company in contoller", company)
   if (!currentEmail) {
     return res.status(400).json({ message: "Current email is required" });
   }
 
+  // Find the existing user
   const user = await prisma.user.findUnique({ where: { email: currentEmail } });
   if (!user) {
     return res.status(404).json({ message: "User not found" });
   }
 
-  const updatedUser = await prisma.user.update({
-    where: { email: currentEmail },
-    data: {
-      full_name: full_name ?? user.full_name,
-      email: email ?? user.email,
-      role: role ?? user.role,
-    },
-  });
+  // Build the update data object
+  const updateData = {
+    full_name: full_name ?? user.full_name,
+    email: email ?? user.email,
+    role: role ?? user.role,
+  };
 
-  res.status(200).json({
-    message: "User updated successfully",
-    updatedUser,
-  });
+  // Only add Client upsert if role is Client AND company is defined
+  if (role === 'Client' && company) {
+    updateData.Client = {
+      upsert: {
+        create: { company },
+        update: { company },
+      },
+    };
+  }
+
+  try {
+    const updatedUser = await prisma.user.update({
+      where: { email: currentEmail },
+      data: updateData,
+      include: { Client: true },
+    });
+
+    res.status(200).json({
+      message: "User updated successfully",
+      updatedUser,
+    });
+  } catch (error) {
+    console.error('Error updating user:', error);
+    res.status(500).json({ message: "Failed to update user", error: error.message });
+  }
 });
 
 
@@ -436,11 +518,21 @@ export const deleteUserByEmail = asyncHandler(async (req, res) => {
 =========================== */
 export const getAllUsers = asyncHandler(async (req, res) => {
   console.log("📥 Fetching all users...");
-  const users = await prisma.user.findMany();
+  const users = await prisma.user.findMany(
+    {
+      include: {
+        Client: true, // includes company, etc.
+      },
+    }
+  );
+  console.log(users)
+
+
 
   if (!users || users.length === 0) {
     return res.status(404).json({ message: "No users found" });
   }
+
 
   res.status(200).json({
     message: "All users fetched successfully",
@@ -483,7 +575,8 @@ export const updatePassword = asyncHandler(async (req, res) => {
   await prisma.user.update({
     where: { email: email },
     data: {
-      password_hash: password
+      password_hash: password,
+
     },
   });
 
