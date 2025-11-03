@@ -8,7 +8,6 @@ import {
   cilFolderOpen,
   cilChart,
   cilSettings,
-  cilCloud,
   cilBell,
   cilLockLocked,
   cilExitToApp,
@@ -16,8 +15,10 @@ import {
 } from '@coreui/icons'
 import { CNavGroup, CNavItem, CNavTitle } from '@coreui/react'
 
-const _nav = [
-  // --- Main Section Heading ---
+// ------------------------------
+// COMMON ITEMS (visible to all)
+// ------------------------------
+const commonItems = [
   {
     component: CNavTitle,
     name: 'Main',
@@ -28,6 +29,36 @@ const _nav = [
     to: '/dashboard',
     icon: <CIcon icon={cilGrid} customClassName="nav-icon" />,
   },
+  {
+    component: CNavItem,
+    name: 'Active Jobs',
+    to: '/jobs',
+    icon: <CIcon icon={cilBriefcase} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Talent Pool',
+    to: '/talent-pool',
+    icon: <CIcon icon={cilFolderOpen} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Notifications',
+    to: '/notifications',
+    icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Activity',
+    to: '/activity-log',
+    icon: <CIcon icon={cilClipboard} customClassName="nav-icon" />,
+  },
+]
+
+// ------------------------------
+// ADMIN-ONLY ITEMS
+// ------------------------------
+const adminOnlyItems = [
   {
     component: CNavItem,
     name: 'Recruiters',
@@ -42,44 +73,16 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'Active Jobs',
-    to: '/jobs',
-    icon: <CIcon icon={cilBriefcase} customClassName="nav-icon" />,
-  },
-  {
-    component: CNavItem,
-    name: 'Talent Pool',
-    to: '/talent-pool',
-    icon: <CIcon icon={cilFolderOpen} customClassName="nav-icon" />,
-  },
-   {
-    component: CNavItem,
     name: 'Position Tracker',
     to: '/position-tracker',
     icon: <CIcon icon={cilBriefcase} customClassName="nav-icon" />,
   },
-  
-   {
+  {
     component: CNavItem,
     name: 'Users',
     to: '/users',
-    icon: <CIcon icon={cilBriefcase} customClassName="nav-icon" />,
+    icon: <CIcon icon={cilPeople} customClassName="nav-icon" />,
   },
-  {
-    component: CNavItem,
-    name: 'Activity',
-    to: '/activity-log',
-    icon: <CIcon icon={cilClipboard} customClassName="nav-icon" />,
-  },
-   {
-    component: CNavItem,
-    name: 'Notifications',
-    to: '/notifications',
-    icon: <CIcon icon={cilBell} customClassName="nav-icon" />,
-  },
-
-
-  // --- System Section Heading ---
   {
     component: CNavTitle,
     name: 'Stats Overview',
@@ -96,8 +99,32 @@ const _nav = [
     to: '/settings',
     icon: <CIcon icon={cilSettings} customClassName="nav-icon" />,
   },
+]
+const clientOnlyItems = [
 
-  // --- Auth Section ---
+  {
+    component: CNavTitle,
+    name: 'Main',
+  },
+  {
+    component: CNavItem,
+    name: 'Dashboard',
+    to: '/dashboard',
+    icon: <CIcon icon={cilGrid} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'Active Jobs',
+    to: '/jobs',
+    icon: <CIcon icon={cilBriefcase} customClassName="nav-icon" />,
+  },
+
+]
+
+// ------------------------------
+// AUTH ITEMS (visible to all)
+// ------------------------------
+const authItems = [
   {
     component: CNavTitle,
     name: 'Authentication',
@@ -107,11 +134,11 @@ const _nav = [
     name: 'Account',
     icon: <CIcon icon={cilLockLocked} customClassName="nav-icon" />,
     items: [
-      {
-        component: CNavItem,
-        name: 'Login',
-        to: '/login',
-      },
+      // {
+      //   component: CNavItem,
+      //   name: 'Login',
+      //   to: '/login',
+      // },
       {
         component: CNavItem,
         name: 'Logout',
@@ -122,4 +149,18 @@ const _nav = [
   },
 ]
 
-export default _nav
+// ------------------------------
+// COMBINE BASED ON ROLE
+// ------------------------------
+const getNavForRole = (role) => {
+  switch (role) {
+    case 'Admin':
+      return [...commonItems, ...adminOnlyItems, ...authItems]
+    case 'Client':
+      return [...clientOnlyItems, ...authItems]
+    default:
+      return [...commonItems, ...authItems]
+  }
+}
+
+export default getNavForRole
